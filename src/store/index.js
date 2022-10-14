@@ -48,6 +48,9 @@ export default createStore({
       state.screendata[screen.value][wid.name] = wid;
       delete state.screendata[screen.value][wid.name].name;
     },
+    alternate(state, { screen, d }) {
+      state.screendata[screen.value] = d;
+    }
   },
   actions: {
     moveUp({ commit, getters }, { screen, wid }) {
@@ -82,6 +85,28 @@ export default createStore({
           commit("updateWidget", { screen, wid: d[index + 1] });
         }
       }
+    },
+    alternate({ commit, getters }, { screen }) {
+      const d = getters.getScreenDataArray(screen.value);
+
+      let toActivate = [];
+      let toDesactivate = [];
+      for (let i = 0; i < d.length; i++) {
+        if (d[i].active && d[i].alt_index != 99) {
+          const index = d.findIndex(x => x.index === d[i].alt_index);
+          toDesactivate.push(d[i]);
+          toActivate.push(d[index]);
+        }
+      }
+
+      for (let i = 0; i < toActivate.length; i++) {
+        toActivate[i].active = true;
+      }
+      for (let i = 0; i < toDesactivate.length; i++) {
+        toDesactivate[i].active = false;
+      }
+      commit("alternate", { screen, d });
+
     },
     fetchScreenData: ({ commit }) => {
       commit('setLoading', true);

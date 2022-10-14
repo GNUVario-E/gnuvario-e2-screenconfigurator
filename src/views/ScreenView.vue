@@ -37,7 +37,7 @@
         <label for="coord" class="form-label">Afficher les coordonnées</label>
         <input
           type="checkbox"
-          class="form-checkbox"
+          class="form-check-input"
           id="coord"
           v-model="displayCoordinates"
         />
@@ -57,6 +57,12 @@
           >
           </vario-widget>
         </div>
+      </div>
+      <div v-if="data && currentscreen">
+        <button class="btn btn-info" @click="alternate()">
+          Voir les alternances
+        </button>
+        <button class="btn btn-info" @click="reset()">reset</button>
       </div>
     </div>
     <div class="col-md-9">
@@ -93,7 +99,7 @@
                 </button>
               </td>
               <td>
-                <label for="active"></label>
+                <label for="active" class="form-label"></label>
                 <input
                   name="active"
                   type="checkbox"
@@ -101,55 +107,61 @@
                   true-value="1"
                   false-value="0"
                   @change="updateWidget(wid)"
+                  class="form-check-input"
                 />
               </td>
               <td>
-                <label for="topx"></label>
+                <label for="topx" class="form-label"></label>
                 <input
                   name="topx"
                   type="number"
                   v-model="wid.topx"
                   @change="updateWidget(wid)"
+                  class="form-control"
                 />
               </td>
               <td>
-                <label for="topy"></label>
+                <label for="topy" class="form-label"></label>
                 <input
                   name="topy"
                   type="number"
                   v-model="wid.topy"
                   @change="updateWidget(wid)"
+                  class="form-control"
                 />
               </td>
               <td>
-                <label for="width"></label>
+                <label for="width" class="form-label"></label>
                 <input
                   name="width"
                   type="number"
                   v-model="wid.width"
                   @change="updateWidget(wid)"
+                  class="form-control"
                 />
               </td>
               <td>
-                <label for="height"></label>
+                <label for="height" class="form-label"></label>
                 <input
                   name="height"
                   type="number"
                   v-model="wid.height"
                   @change="updateWidget(wid)"
+                  class="form-control"
                 />
               </td>
-              <td>
-                <label for="alt_index"></label>
+              <td :class="{ 'bg-info': wid.alt_index != 99 }">
+                <label for="alt_index" class="form-label"></label>
                 <input
                   name="alt_index"
                   type="number"
                   v-model="wid.alt_index"
                   @change="updateWidget(wid)"
+                  class="form-control"
                 />
               </td>
               <td>
-                <label for="border"></label>
+                <label for="border" class="form-label"></label>
                 <input
                   name="border"
                   type="checkbox"
@@ -157,6 +169,7 @@
                   :true-value="1"
                   :false-value="0"
                   @change="updateWidget(wid)"
+                  class="form-check-input"
                 />
               </td>
             </tr>
@@ -204,16 +217,19 @@ export default {
   setup() {
     const store = useStore();
 
-    const currentscreen = ref(null);
-    const screensize = ref(null);
-    const displayCoordinates = ref(false);
+    let currentscreen = ref(null);
+    let screensize = ref(null);
+    let displayCoordinates = ref(false);
     const sizes = [
       { key: "29", label: "2.9 pouces" },
       { key: "19", label: "1.94 pouces" },
     ];
     onMounted(() => {
       // console.log("mounted");
-      store.dispatch("fetchScreenData");
+      store.dispatch("fetchScreenData").then(() => {
+        currentscreen.value = 'vario1';
+        screensize.value = 29;
+      });
     });
 
     function updateWidget(wid) {
@@ -226,6 +242,14 @@ export default {
 
     function moveDown(wid) {
       store.dispatch("moveDown", { screen: currentscreen, wid });
+    }
+
+    function alternate() {
+      store.dispatch("alternate", { screen: currentscreen });
+    }
+
+    function reset() {
+      store.dispatch("fetchScreenData");
     }
 
     return {
@@ -245,6 +269,8 @@ export default {
       updateWidget,
       moveUp,
       moveDown,
+      alternate,
+      reset,
       jsondata: computed(() => {
         return store.state.screendata;
       }),

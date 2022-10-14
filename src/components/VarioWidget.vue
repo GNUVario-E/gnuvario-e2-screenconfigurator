@@ -26,6 +26,7 @@
         <font-awesome-icon icon="fa-solid fa-arrow-up" />
       </button>
     </div>
+
     <div>
       <span v-if="displayCoordinates" class="coord">
         x:{{ wid.topx }}, y:{{ wid.topy }}, w:{{ wid.width }}, h:{{
