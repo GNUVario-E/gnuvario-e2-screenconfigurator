@@ -1,11 +1,11 @@
 <template>
   <div
-    :class="['widget', wid.border == 1 ? 'widget-border' : 'widget-noborder']"
+    :class="['widget', wid.b == 1 ? 'widget-border' : 'widget-noborder']"
     :style="{
-      left: wid.topx + 'px',
-      top: wid.topy + 'px',
-      width: wid.width + 'px',
-      height: wid.height + 'px',
+      left: wid.x + 'px',
+      top: wid.y + 'px',
+      width: wid.w + 'px',
+      height: wid.h + 'px',
       'margin-left': -1 + 'px',
       'margin-top': -1 + 'px',
     }"
@@ -14,14 +14,14 @@
       <button
         class="btn btn-link btn-sm px-0"
         @click="$emit('movedown')"
-        v-show="wid.active && idx < nbActive - 1"
+        v-show="wid.a && idx < nbActive - 1"
       >
         <font-awesome-icon icon="fa-solid fa-arrow-down" />
       </button>
       <button
         class="btn btn-link btn-sm px-0"
         @click="$emit('moveup')"
-        v-show="wid.active && idx > 0"
+        v-show="wid.a && idx > 0"
       >
         <font-awesome-icon icon="fa-solid fa-arrow-up" />
       </button>
@@ -29,10 +29,8 @@
 
     <div>
       <span v-if="displayCoordinates" class="coord">
-        x:{{ wid.topx }}, y:{{ wid.topy }}, w:{{ wid.width }}, h:{{
-          wid.height
-        }}</span
-      >
+        x:{{ wid.topx }}, y:{{ wid.y }}, w:{{ wid.w }}, h:{{ wid.h }}
+      </span>
     </div>
     <strong>{{ wid.name }}</strong>
   </div>
@@ -50,10 +48,8 @@ export default {
   },
   setup() {
     onMounted(() => {
-      console.log("mounted");
+      // console.log("mounted");
     });
-
-    return {};
   },
 };
 </script>

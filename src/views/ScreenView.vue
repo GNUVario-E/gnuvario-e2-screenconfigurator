@@ -42,27 +42,30 @@
           v-model="displayCoordinates"
         />
       </div>
-      <div v-if="screensize" :class="['screen', 'screen' + screensize]">
-        <div v-if="data && currentscreen">
-          <vario-widget
-            v-for="(wid, idx) in data"
-            v-show="wid.active == 1"
-            :wid="wid"
-            :displayCoordinates="displayCoordinates"
-            :idx="idx"
-            :nbActive="nbActive"
-            :key="wid.name"
-            @moveup="moveUp(wid)"
-            @movedown="moveDown(wid)"
-          >
-          </vario-widget>
+      <div class="mb-3">
+        <div v-if="data && currentscreen" class="mb-3">
+          <button class="btn btn-info" @click="alternate()">
+            Voir les alternances
+          </button>
+          &nbsp;
+          <button class="btn btn-info" @click="reset()">reset</button>
         </div>
-      </div>
-      <div v-if="data && currentscreen">
-        <button class="btn btn-info" @click="alternate()">
-          Voir les alternances
-        </button>
-        <button class="btn btn-info" @click="reset()">reset</button>
+        <div v-if="screensize" :class="['screen', 'screen' + screensize]">
+          <div v-if="data && currentscreen">
+            <vario-widget
+              v-for="(wid, idx) in data"
+              v-show="wid.a == 1"
+              :wid="wid"
+              :displayCoordinates="displayCoordinates"
+              :idx="idx"
+              :nbActive="nbActive"
+              :key="wid.name"
+              @moveup="moveUp(wid)"
+              @movedown="moveDown(wid)"
+            >
+            </vario-widget>
+          </div>
+        </div>
       </div>
     </div>
     <div class="col-md-9">
@@ -71,8 +74,8 @@
           <thead>
             <th>Widget</th>
             <th>Active</th>
-            <th>topx</th>
-            <th>topy</th>
+            <th>x</th>
+            <th>y</th>
             <th>Width</th>
             <th>Height</th>
             <th>Alternate index</th>
@@ -80,92 +83,111 @@
           </thead>
           <tbody>
             <tr v-for="(wid, idx) in data" :key="wid.name">
-              <td>
-                {{ wid.name }}
-                <br />
-                <button
-                  class="btn btn-link btn-sm"
-                  @click="moveDown(wid)"
-                  v-show="wid.active == 1 && idx < nbActive - 1"
+              <td class="text-start" style="width: 145px">
+                <div
+                  class="widname"
+                  :style="{
+                    border: indexesUsed.includes(wid.i)
+                      ? '2px solid ' + palette[wid.i]
+                      : '',
+                  }"
                 >
-                  <font-awesome-icon icon="fa-solid fa-arrow-down" />
-                </button>
-                <button
-                  class="btn btn-link btn-sm"
-                  @click="moveUp(wid)"
-                  v-show="wid.active == 1 && idx > 0"
-                >
-                  <font-awesome-icon icon="fa-solid fa-arrow-up" />
-                </button>
+                  {{ wid.name }}
+                  <button
+                    class="btn btn-link btn-sm"
+                    @click="moveDown(wid)"
+                    v-show="wid.a == 1 && idx < nbActive - 1"
+                  >
+                    <font-awesome-icon icon="fa-solid fa-arrow-down" />
+                  </button>
+                  <button
+                    class="btn btn-link btn-sm"
+                    @click="moveUp(wid)"
+                    v-show="wid.a == 1 && idx > 0"
+                  >
+                    <font-awesome-icon icon="fa-solid fa-arrow-up" />
+                  </button>
+                  <div
+                    class="disp-index"
+                    :style="{
+                      'background-color': indexesUsed.includes(wid.i)
+                        ? palette[wid.i]
+                        : '',
+                    }"
+                  >
+                    ({{ wid.i }})
+                  </div>
+                </div>
               </td>
               <td>
-                <label for="active" class="form-label"></label>
                 <input
                   name="active"
                   type="checkbox"
-                  v-model="wid.active"
-                  true-value="1"
-                  false-value="0"
+                  v-model="wid.a"
+                  :true-value="1"
+                  :false-value="0"
                   @change="updateWidget(wid)"
                   class="form-check-input"
                 />
               </td>
-              <td>
-                <label for="topx" class="form-label"></label>
+              <td class="col-small">
                 <input
-                  name="topx"
+                  name="x"
                   type="number"
-                  v-model="wid.topx"
+                  v-model="wid.x"
                   @change="updateWidget(wid)"
-                  class="form-control"
+                  class="form-control form-control-sm"
                 />
               </td>
-              <td>
-                <label for="topy" class="form-label"></label>
+              <td class="col-small">
                 <input
-                  name="topy"
+                  name="y"
                   type="number"
-                  v-model="wid.topy"
+                  v-model="wid.y"
                   @change="updateWidget(wid)"
-                  class="form-control"
+                  class="form-control form-control-sm"
                 />
               </td>
-              <td>
-                <label for="width" class="form-label"></label>
+              <td class="col-small">
                 <input
                   name="width"
                   type="number"
-                  v-model="wid.width"
+                  v-model="wid.w"
                   @change="updateWidget(wid)"
-                  class="form-control"
+                  class="form-control form-control-sm"
                 />
               </td>
-              <td>
-                <label for="height" class="form-label"></label>
+              <td class="col-small">
                 <input
                   name="height"
                   type="number"
-                  v-model="wid.height"
+                  v-model="wid.h"
                   @change="updateWidget(wid)"
-                  class="form-control"
+                  class="form-control form-control-sm"
                 />
               </td>
-              <td :class="{ 'bg-info': wid.alt_index != 99 }">
-                <label for="alt_index" class="form-label"></label>
-                <input
-                  name="alt_index"
-                  type="number"
-                  v-model="wid.alt_index"
+              <td
+                :style="{
+                  'background-color': wid.n != 99 ? palette[wid.n] : '',
+                }"
+              >
+                <select
+                  class="form-select"
+                  name="idx"
+                  id="idx"
+                  v-model="wid.n"
                   @change="updateWidget(wid)"
-                  class="form-control"
-                />
+                >
+                  <option :value="v.index" v-for="v in indexes" :key="v.index">
+                    {{ v.name }}
+                  </option>
+                </select>
               </td>
               <td>
-                <label for="border" class="form-label"></label>
                 <input
                   name="border"
                   type="checkbox"
-                  v-model="wid.border"
+                  v-model="wid.b"
                   :true-value="1"
                   :false-value="0"
                   @change="updateWidget(wid)"
@@ -197,6 +219,13 @@
           {{ jsondata }}
         </div>
       </div>
+      <button class="btn btn-success" @click="exportJson()">
+        Exporter l'écran courant
+      </button>
+      <!-- <button class="btn btn-success" @click="importJson()">
+        Importer json
+      </button> -->
+      <!-- <textarea cols="30" rows="10" v-model="jsonimportdata"></textarea> -->
     </div>
   </div>
 </template>
@@ -220,14 +249,16 @@ export default {
     let currentscreen = ref(null);
     let screensize = ref(null);
     let displayCoordinates = ref(false);
+    let jsonimportdata = ref(null);
+
     const sizes = [
       { key: "29", label: "2.9 pouces" },
-      { key: "19", label: "1.94 pouces" },
+      { key: "15", label: "1.54 pouces" },
     ];
     onMounted(() => {
       // console.log("mounted");
       store.dispatch("fetchScreenData").then(() => {
-        currentscreen.value = 'vario1';
+        currentscreen.value = "vario1";
         screensize.value = 29;
       });
     });
@@ -252,15 +283,30 @@ export default {
       store.dispatch("fetchScreenData");
     }
 
+    function exportJson() {
+      store.dispatch("exportJson", { screen: currentscreen });
+    }
+
+    function importJson() {
+      store.dispatch("importJson", { data: jsonimportdata });
+    }
+
     return {
+      palette: store.state.palette,
       screens: computed(() => store.getters.getScreenList),
       data: computed(() => {
         return store.getters.getScreenDataArray(currentscreen.value);
       }),
+      indexes: computed(() => {
+        return store.getters.getIndexesList(currentscreen.value);
+      }),
+      indexesUsed: computed(() => {
+        return store.getters.getIndexesUsedList(currentscreen.value);
+      }),
       nbActive: computed(() => {
         return store.getters
           .getScreenDataArray(currentscreen.value)
-          .filter((wid) => wid.active == 1).length;
+          .filter((wid) => wid.a == 1).length;
       }),
       currentscreen,
       screensize,
@@ -271,6 +317,9 @@ export default {
       moveDown,
       alternate,
       reset,
+      exportJson,
+      importJson,
+      jsonimportdata,
       jsondata: computed(() => {
         return store.state.screendata;
       }),
@@ -290,8 +339,25 @@ export default {
   height: 296px;
 }
 
-.screen19 {
+.screen15 {
   width: 200px;
   height: 200px;
+}
+.widname {
+  position: relative;
+  /* width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0; */
+}
+.col-small {
+  max-width: 90px;
+}
+.disp-index {
+  position: absolute;
+  bottom: -7px;
+  font-size: 0.7em;
+  right: 0;
+  color: #666;
 }
 </style>
