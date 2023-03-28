@@ -1,14 +1,17 @@
 <template>
   <div class="row">
     <div class="col-md-3">
+      <!-- create input for file upload -->
+      <div class="mb-3">
+        <label for="file" class="form-label">Fichier JSON</label>
+        <input type="file" class="form-control" id="file" ref="myfile" @change="onFileChange" accept=".json" />
+        <div id="emailHelp" class="form-text">
+          Fichier de configuration des widgets.
+        </div>
+      </div>
       <div class="mb-3">
         <label for="screen" class="form-label">Taille de l'écran</label>
-        <select
-          class="form-select"
-          name="screensize"
-          id="screensize"
-          v-model="screensize"
-        >
+        <select class="form-select" name="screensize" id="screensize" v-model="screensize">
           <option :value="s.key" v-for="s in sizes" :key="s.key">
             {{ s.label }}
           </option>
@@ -19,12 +22,7 @@
       </div>
       <div class="mb-3">
         <label for="screen" class="form-label">Ecran</label>
-        <select
-          class="form-select"
-          name="screen"
-          id="screen"
-          v-model="currentscreen"
-        >
+        <select class="form-select" name="screen" id="screen" v-model="currentscreen">
           <option :value="s" v-for="s in screens" :key="s">
             {{ s }}
           </option>
@@ -35,12 +33,7 @@
       </div>
       <div class="mb-3">
         <label for="coord" class="form-label">Afficher les coordonnées</label>
-        <input
-          type="checkbox"
-          class="form-check-input"
-          id="coord"
-          v-model="displayCoordinates"
-        />
+        <input type="checkbox" class="form-check-input" id="coord" v-model="displayCoordinates" />
       </div>
       <div class="mb-3">
         <div v-if="data && currentscreen" class="mb-3">
@@ -52,17 +45,9 @@
         </div>
         <div v-if="screensize" :class="['screen', 'screen' + screensize]">
           <div v-if="data && currentscreen">
-            <vario-widget
-              v-for="(wid, idx) in data"
-              v-show="wid.a == 1"
-              :wid="wid"
-              :displayCoordinates="displayCoordinates"
-              :idx="idx"
-              :nbActive="nbActive"
-              :key="wid.name"
-              @moveup="moveUp(wid)"
-              @movedown="moveDown(wid)"
-            >
+            <vario-widget v-for="(wid, idx) in data" v-show="wid.a == 1" :wid="wid"
+              :displayCoordinates="displayCoordinates" :idx="idx" :nbActive="nbActive" :key="wid.name"
+              @moveup="moveUp(wid)" @movedown="moveDown(wid)">
             </vario-widget>
           </div>
         </div>
@@ -84,115 +69,59 @@
           <tbody>
             <tr v-for="(wid, idx) in data" :key="wid.name">
               <td class="text-start" style="width: 145px">
-                <div
-                  class="widname"
-                  :style="{
-                    border: indexesUsed.includes(wid.i)
-                      ? '2px solid ' + palette[wid.i]
-                      : '',
-                  }"
-                >
+                <div class="widname" :style="{
+                  border: indexesUsed.includes(wid.i)
+                    ? '2px solid ' + palette[wid.i]
+                    : '',
+                }">
                   {{ wid.name }}
-                  <button
-                    class="btn btn-link btn-sm"
-                    @click="moveDown(wid)"
-                    v-show="wid.a == 1 && idx < nbActive - 1"
-                  >
+                  <button class="btn btn-link btn-sm" @click="moveDown(wid)" v-show="wid.a == 1 && idx < nbActive - 1">
                     <font-awesome-icon icon="fa-solid fa-arrow-down" />
                   </button>
-                  <button
-                    class="btn btn-link btn-sm"
-                    @click="moveUp(wid)"
-                    v-show="wid.a == 1 && idx > 0"
-                  >
+                  <button class="btn btn-link btn-sm" @click="moveUp(wid)" v-show="wid.a == 1 && idx > 0">
                     <font-awesome-icon icon="fa-solid fa-arrow-up" />
                   </button>
-                  <div
-                    class="disp-index"
-                    :style="{
-                      'background-color': indexesUsed.includes(wid.i)
-                        ? palette[wid.i]
-                        : '',
-                    }"
-                  >
+                  <div class="disp-index" :style="{
+                    'background-color': indexesUsed.includes(wid.i)
+                      ? palette[wid.i]
+                      : '',
+                  }">
                     ({{ wid.i }})
                   </div>
                 </div>
               </td>
               <td>
-                <input
-                  name="active"
-                  type="checkbox"
-                  v-model="wid.a"
-                  :true-value="1"
-                  :false-value="0"
-                  @change="updateWidget(wid)"
-                  class="form-check-input"
-                />
+                <input name="active" type="checkbox" v-model="wid.a" :true-value="1" :false-value="0"
+                  @change="updateWidget(wid)" class="form-check-input" />
               </td>
               <td class="col-small">
-                <input
-                  name="x"
-                  type="number"
-                  v-model="wid.x"
-                  @change="updateWidget(wid)"
-                  class="form-control form-control-sm"
-                />
+                <input name="x" type="number" v-model="wid.x" @change="updateWidget(wid)"
+                  class="form-control form-control-sm" />
               </td>
               <td class="col-small">
-                <input
-                  name="y"
-                  type="number"
-                  v-model="wid.y"
-                  @change="updateWidget(wid)"
-                  class="form-control form-control-sm"
-                />
+                <input name="y" type="number" v-model="wid.y" @change="updateWidget(wid)"
+                  class="form-control form-control-sm" />
               </td>
               <td class="col-small">
-                <input
-                  name="width"
-                  type="number"
-                  v-model="wid.w"
-                  @change="updateWidget(wid)"
-                  class="form-control form-control-sm"
-                />
+                <input name="width" type="number" v-model="wid.w" @change="updateWidget(wid)"
+                  class="form-control form-control-sm" />
               </td>
               <td class="col-small">
-                <input
-                  name="height"
-                  type="number"
-                  v-model="wid.h"
-                  @change="updateWidget(wid)"
-                  class="form-control form-control-sm"
-                />
+                <input name="height" type="number" v-model="wid.h" @change="updateWidget(wid)"
+                  class="form-control form-control-sm" />
               </td>
-              <td
-                :style="{
-                  'background-color': wid.n != 99 ? palette[wid.n] : '',
-                }"
-              >
-                <select
-                  class="form-select"
-                  name="idx"
-                  id="idx"
-                  v-model="wid.n"
-                  @change="updateWidget(wid)"
-                >
+              <td :style="{
+                'background-color': wid.n != 99 ? palette[wid.n] : '',
+              }">
+                <select class="form-select" name="idx" id="idx" v-model="wid.n" @change="updateWidget(wid)">
                   <option :value="v.index" v-for="v in indexes" :key="v.index">
                     {{ v.name }}
                   </option>
                 </select>
               </td>
               <td>
-                <input
-                  name="border"
-                  type="checkbox"
-                  v-model="wid.b"
-                  :true-value="1"
-                  :false-value="0"
-                  @change="updateWidget(wid)"
-                  class="form-check-input"
-                />
+                <input name="border" type="checkbox" v-model="wid.b" :true-value="1" :false-value="0"
+                  @change="updateWidget(wid)" class="form-check-input" />
               </td>
             </tr>
           </tbody>
@@ -203,14 +132,8 @@
   <div class="row">
     <div class="col-md-12">
       <p>
-        <a
-          class="btn btn-primary"
-          data-bs-toggle="collapse"
-          href="#collapseExample"
-          role="button"
-          aria-expanded="false"
-          aria-controls="collapseExample"
-        >
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
+          aria-controls="collapseExample">
           Voir/cacher les données json
         </a>
       </p>
@@ -250,6 +173,7 @@ export default {
     let screensize = ref(null);
     let displayCoordinates = ref(false);
     let jsonimportdata = ref(null);
+    let myfile = ref(null);
 
     const sizes = [
       { key: "29", label: "2.9 pouces" },
@@ -262,6 +186,16 @@ export default {
         screensize.value = 29;
       });
     });
+
+    function onFileChange() {
+      const file = myfile.value.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        jsonimportdata.value = e.target.result;
+        importJson();
+      };
+      reader.readAsText(file);
+    }
 
     function updateWidget(wid) {
       store.commit("updateWidget", { screen: currentscreen, wid });
@@ -291,6 +225,8 @@ export default {
       store.dispatch("importJson", { data: jsonimportdata });
     }
 
+
+
     return {
       palette: store.state.palette,
       screens: computed(() => store.getters.getScreenList),
@@ -319,7 +255,9 @@ export default {
       reset,
       exportJson,
       importJson,
+      onFileChange,
       jsonimportdata,
+      myfile,
       jsondata: computed(() => {
         return store.state.screendata;
       }),
@@ -334,6 +272,7 @@ export default {
   border: 1px dashed rgb(255, 141, 221);
   position: relative;
 }
+
 .screen29 {
   width: 128px;
   height: 296px;
@@ -343,6 +282,7 @@ export default {
   width: 200px;
   height: 200px;
 }
+
 .widname {
   position: relative;
   /* width: 100%;
@@ -350,9 +290,11 @@ export default {
   margin: 0;
   padding: 0; */
 }
+
 .col-small {
   max-width: 90px;
 }
+
 .disp-index {
   position: absolute;
   bottom: -7px;
